@@ -43,7 +43,7 @@ public class Empilhadora implements ImageTile{
 			position = newPosition;
 		}
 	}
-	public void changeImage(int key) {
+	private void changeImage(int key) {
 		switch(key) {
 			case KeyEvent.VK_DOWN:
 				imageName="Empilhadora_D";

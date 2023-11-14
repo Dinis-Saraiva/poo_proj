@@ -3,6 +3,9 @@ package pt.iscte.poo.sokobanstarter;
 //import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 import pt.iscte.poo.gui.ImageMatrixGUI;
 import pt.iscte.poo.gui.ImageTile;
@@ -65,9 +68,10 @@ public class GameEngine implements Observer {
 		
 		// Criar o cenario de jogo
 		createWarehouse();      // criar o armazem
-		createMoreStuff();      // criar mais algun objetos (empilhadora, caixotes,...)
+		//createMoreStuff();      // criar mais algun objetos (empilhadora, caixotes,...)
+		scanWarehouse();
 		sendImagesToGUI();      // enviar as imagens para a GUI
-
+		
 		
 		// Escrever uma mensagem na StatusBar
 		gui.setStatusMessage("Sokoban Starter - demo");
@@ -109,5 +113,65 @@ public class GameEngine implements Observer {
 	// Nao e' suposto re-enviar os objetos se a unica coisa que muda sao as posicoes  
 	private void sendImagesToGUI() {
 		gui.addImages(tileList);
+	}
+	//scan a um warehouse escolhido manualmente
+	public void scanWarehouse() {
+		try {
+
+			Scanner sc= new Scanner(new File("level0.txt"));
+			String s= new String();
+			char[] line;
+			int countLine=0;
+			
+			while(sc.hasNextLine()) {
+				s = sc.nextLine();
+				line=s.toCharArray();
+				for(int column=0; column<line.length; column++) {
+					lerChar(line[column],new Point2D(column, countLine));
+				}
+				countLine++;
+			}
+			sc.close();
+			
+		} catch(FileNotFoundException e) {
+			System.err.println("Ficheiro  nao encontrado");
+		}
+		gui.update();
+		
+	}
+	
+	
+	//LE CHAR e dá push a imagem no gui na posiçao p
+	//temos que adiconar chao debaixo da empilhadora/caixas/etc
+	public void lerChar(char c, Point2D p) {
+		if(c=='E') {
+			bobcat = new Empilhadora(p);
+			tileList.add(bobcat);
+			}
+		if(c=='C')
+			tileList.add(new Caixote(p));
+		else if(c=='X')
+			tileList.add(new Alvo(p));
+		else if(c=='B') 
+			tileList.add(new Bateria(p));
+		else if(c=='#')
+			tileList.add(new Parede(p));
+		else if(c==' ')
+			tileList.add(new Chao(p));
+		else if(c=='=') 
+			tileList.add(new Chao(p));
+		else if(c=='O')
+			tileList.add(new Buraco(p));
+		else if(c=='P')
+			tileList.add(new Palete(p));
+		else if(c=='M')
+			tileList.add(new Martelo(p));
+		else if(c=='%')
+			tileList.add(new ParedeRachada(p));
+		else if(c=='T')
+			tileList.add(new Teleporte(p));
+		
+			
+	
 	}
 }
