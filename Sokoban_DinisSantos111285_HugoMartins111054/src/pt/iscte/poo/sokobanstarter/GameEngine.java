@@ -35,17 +35,16 @@ public class GameEngine implements Observer {
 	// Dimensoes da grelha de jogo
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
+	private static final String FICHEIRO="level0.txt";
 
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
-	private List<ImageTile> tileList;	// Lista de imagens
 	private List<GameElement> board;	//Lista dos objetos
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 
 
 	// Construtor - neste exemplo apenas inicializa uma lista de ImageTiles
 	private GameEngine() {
-		tileList = new ArrayList<>();   
 		board=new ArrayList<>();
 	}
 
@@ -72,7 +71,6 @@ public class GameEngine implements Observer {
 		createWarehouse();      // criar o armazem
 		//createMoreStuff();      // criar mais algun objetos (empilhadora, caixotes,...)
 		scanWarehouse();
-		sendImagesToGUI();      // enviar as imagens para a GUI
 		
 		
 		// Escrever uma mensagem na StatusBar
@@ -99,28 +97,13 @@ public class GameEngine implements Observer {
 
 		for (int y=0; y<GRID_HEIGHT; y++)
 			for (int x=0; x<GRID_HEIGHT; x++)
-				tileList.add(new Chao(new Point2D(x,y)));		
-	}
-
-	// Criacao de mais objetos - neste exemplo e' uma empilhadora e dois caixotes
-	private void createMoreStuff() {
-		bobcat = new Empilhadora( new Point2D(5,5));
-		tileList.add(bobcat);
-
-		tileList.add(new Caixote(new Point2D(3,3)));
-		tileList.add(new Caixote(new Point2D(3,2)));
-	}
-
-	// Envio das mensagens para a GUI - note que isto so' precisa de ser feito no inicio
-	// Nao e' suposto re-enviar os objetos se a unica coisa que muda sao as posicoes  
-	private void sendImagesToGUI() {
-		gui.addImages(tileList);
+				add(new Chao(new Point2D(x,y)));		
 	}
 	//scan a um warehouse escolhido manualmente
 	public void scanWarehouse() {
 		try {
 
-			Scanner sc= new Scanner(new File("level0.txt"));
+			Scanner sc= new Scanner(new File(FICHEIRO));
 			String s= new String();
 			char[] line;
 			int countLine=0;
@@ -129,7 +112,7 @@ public class GameEngine implements Observer {
 				s = sc.nextLine();
 				line=s.toCharArray();
 				for(int column=0; column<line.length; column++) {
-					tileList.add(GameElement.createElement(line[column],new Point2D(column, countLine)));
+					add(GameElement.createElement(line[column],new Point2D(column, countLine)));
 				}
 				countLine++;
 			}
@@ -146,7 +129,12 @@ public class GameEngine implements Observer {
 		this.bobcat = bobcat;
 	}
 	
-	
-	//LE CHAR e dá push a imagem no gui na posiçao p
-	//temos que adiconar chao debaixo da empilhadora/caixas/etc
+	public void add(GameElement e) {
+		board.add(e);
+		gui.addImage(e);
+	}
+	public void remove(GameElement e) {
+		board.remove(e);
+		gui.removeImage(e);
+	}
 }

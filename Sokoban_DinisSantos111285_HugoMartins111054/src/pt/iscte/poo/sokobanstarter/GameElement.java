@@ -34,8 +34,8 @@ public abstract class GameElement implements ImageTile{
 			return new Parede(p);
 		else if(c==' ')
 			return new Chao(p);
-		//else if(c=='=') 
-			// new Chao(p); adicionar vazio
+		else if(c=='=') 
+			 return new Vazio(p);
 		else if(c=='O')
 			return new Buraco(p);
 		else if(c=='P')
