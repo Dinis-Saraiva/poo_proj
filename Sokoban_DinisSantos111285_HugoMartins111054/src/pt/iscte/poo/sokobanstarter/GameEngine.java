@@ -39,12 +39,14 @@ public class GameEngine implements Observer {
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
 	private List<ImageTile> tileList;	// Lista de imagens
+	private List<GameElement> board;	//Lista dos objetos
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
 
 
 	// Construtor - neste exemplo apenas inicializa uma lista de ImageTiles
 	private GameEngine() {
 		tileList = new ArrayList<>();   
+		board=new ArrayList<>();
 	}
 
 	// Implementacao do singleton para o GameEngine
@@ -127,7 +129,7 @@ public class GameEngine implements Observer {
 				s = sc.nextLine();
 				line=s.toCharArray();
 				for(int column=0; column<line.length; column++) {
-					lerChar(line[column],new Point2D(column, countLine));
+					tileList.add(GameElement.createElement(line[column],new Point2D(column, countLine)));
 				}
 				countLine++;
 			}
@@ -139,39 +141,12 @@ public class GameEngine implements Observer {
 		gui.update();
 		
 	}
+
+	public void setBobcat(Empilhadora bobcat) {
+		this.bobcat = bobcat;
+	}
 	
 	
 	//LE CHAR e dá push a imagem no gui na posiçao p
 	//temos que adiconar chao debaixo da empilhadora/caixas/etc
-	public void lerChar(char c, Point2D p) {
-		if(c=='E') {
-			bobcat = new Empilhadora(p);
-			tileList.add(bobcat);
-			}
-		if(c=='C')
-			tileList.add(new Caixote(p));
-		else if(c=='X')
-			tileList.add(new Alvo(p));
-		else if(c=='B') 
-			tileList.add(new Bateria(p));
-		else if(c=='#')
-			tileList.add(new Parede(p));
-		else if(c==' ')
-			tileList.add(new Chao(p));
-		else if(c=='=') 
-			tileList.add(new Chao(p));
-		else if(c=='O')
-			tileList.add(new Buraco(p));
-		else if(c=='P')
-			tileList.add(new Palete(p));
-		else if(c=='M')
-			tileList.add(new Martelo(p));
-		else if(c=='%')
-			tileList.add(new ParedeRachada(p));
-		else if(c=='T')
-			tileList.add(new Teleporte(p));
-		
-			
-	
-	}
 }

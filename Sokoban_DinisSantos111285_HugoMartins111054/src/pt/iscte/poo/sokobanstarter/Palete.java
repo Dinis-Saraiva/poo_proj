@@ -3,27 +3,9 @@ package pt.iscte.poo.sokobanstarter;
 import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.utils.Point2D;
 
-public class Palete implements ImageTile {
+public class Palete extends GameElement {
 
-	private Point2D Point2D;
-	
-	public Palete(Point2D Point2D){
-		this.Point2D = Point2D;
+	public Palete(Point2D point2d) {
+		super(point2d, 1, "Palete");
 	}
-	
-	@Override
-	public String getName() {
-		return "Palete";
-	}
-
-	@Override
-	public Point2D getPosition() {
-		return Point2D;
-	}
-
-	@Override
-	public int getLayer() {
-		return 1;
-	}
-
 }
