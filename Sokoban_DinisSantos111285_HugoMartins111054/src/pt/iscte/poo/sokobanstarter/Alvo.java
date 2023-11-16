@@ -5,7 +5,7 @@ import pt.iscte.poo.utils.Point2D;
 
 public class Alvo extends GameElement {
 
-	public Alvo(Point2D point2d) {
-		super(point2d, 1, "Alvo");
+	public Alvo(Point2D position) {
+		super(position, 1, "Alvo",true,false,false);
 	}
 }

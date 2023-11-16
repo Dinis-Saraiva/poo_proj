@@ -6,6 +6,6 @@ import pt.iscte.poo.utils.Point2D;
 public class Teleporte extends GameElement {
 
 	public Teleporte(Point2D point2d) {
-		super(point2d, 1, "Teleporte");
+		super(point2d, 1, "Teleporte",true,false,false);
 	}
 }

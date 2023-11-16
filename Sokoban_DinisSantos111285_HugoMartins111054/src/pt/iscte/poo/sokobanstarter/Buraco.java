@@ -6,6 +6,6 @@ import pt.iscte.poo.utils.Point2D;
 public class Buraco extends GameElement {
 
 	public Buraco(Point2D point2d) {
-		super(point2d, 1, "Buraco");
+		super(point2d, 1, "Buraco",true,false,false);
 	}
 }

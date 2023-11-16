@@ -4,6 +4,7 @@ package pt.iscte.poo.sokobanstarter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Predicate;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -35,13 +36,13 @@ public class GameEngine implements Observer {
 	// Dimensoes da grelha de jogo
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
-	private static final String FICHEIRO="level0.txt";
+	private static final String FICHEIRO="level1.txt";
 
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
 	private List<GameElement> board;	//Lista dos objetos
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
-
+	private String username;
 
 	// Construtor - neste exemplo apenas inicializa uma lista de ImageTiles
 	private GameEngine() {
@@ -74,7 +75,7 @@ public class GameEngine implements Observer {
 		
 		
 		// Escrever uma mensagem na StatusBar
-		gui.setStatusMessage("Sokoban Starter - demo");
+		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
 	}
 
 	// O metodo update() e' invocado automaticamente sempre que o utilizador carrega numa tecla
@@ -84,11 +85,14 @@ public class GameEngine implements Observer {
 
 		int key = gui.keyPressed();    // obtem o codigo da tecla pressionada
 
-		if (Direction.isDirection(key))  // se a tecla for UP/DOWN/LEFT/RIGHT, manda a empilhadora mover
-			bobcat.move(key);			
-
+		if (Direction.isDirection(key)) {  // se a tecla for UP/DOWN/LEFT/RIGHT, manda a empilhadora mover
+			bobcat.tryMove(key);
+			}
 		gui.update();                  // redesenha a lista de ImageTiles na GUI, 
-		                               // tendo em conta as novas posicoes dos objetos
+		                              // tendo em conta as novas posicoes dos objetos
+		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
+		if(!gameEnded()) {
+		}
 	}
 
 
@@ -137,4 +141,36 @@ public class GameEngine implements Observer {
 		board.remove(e);
 		gui.removeImage(e);
 	}
+	public boolean gameEnded() {
+		int test=0;
+		if( bobcat.getEnergia()>0) {
+		
+		for(GameElement g:board) {
+			if(g instanceof Alvo) {
+				for(GameElement i:board) {
+					if(i.getPosition().equals(g.getPosition())) {
+						if(i instanceof Caixote)
+							test=1;
+					}	
+				}
+				if (test==0)
+					return false;
+			} 
+			test=0;
+		}
+		}
+		System.out.println("A energia que restou é " + bobcat.getEnergia());
+		System.exit(1);
+		return true;
+		
+	}
+	public List<GameElement> select(Predicate<GameElement> pred) {
+		List<GameElement> resultado=new ArrayList<>();
+		for(GameElement g:board) {
+			if(pred.test(g))
+				resultado.add(g);
+		}
+		return resultado;
+	}
+
 }

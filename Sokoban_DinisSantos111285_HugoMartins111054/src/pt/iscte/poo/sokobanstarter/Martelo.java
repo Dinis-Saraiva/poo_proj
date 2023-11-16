@@ -6,6 +6,6 @@ import pt.iscte.poo.utils.Point2D;
 public class Martelo extends GameElement {
 
 	public Martelo(Point2D point2d) {
-		super(point2d, 1, "Martelo");
+		super(point2d, 1, "Martelo",true,false,true);
 	}
 }

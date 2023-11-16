@@ -1,6 +1,10 @@
 package pt.iscte.poo.sokobanstarter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import pt.iscte.poo.gui.ImageTile;
+import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
 public abstract class GameElement implements ImageTile{
@@ -8,14 +12,31 @@ public abstract class GameElement implements ImageTile{
 	private Point2D position;
 	private String name;
 	private int layer;
+	
+	private boolean trasposable;
+	private boolean moveable;
+	private boolean pickable;
 
-	public GameElement(Point2D position, int layer, String name) {
-		super();
-		this.position = position;
-		this.layer = layer;
-		this.name = name;
+	
+
+	public boolean isMoveable() {
+		return moveable;
 	}
 
+	public GameElement(Point2D position, int layer,String name,boolean trasposable, boolean moveable,
+			boolean pickable) {
+		super();
+		this.position = position;
+		this.name = name;
+		this.layer = layer;
+		this.trasposable = trasposable;
+		this.moveable = moveable;
+		this.pickable = pickable;
+	}
+
+	public boolean isTrasposable() {
+		return trasposable;
+	}
 
 	public static GameElement createElement(char c, Point2D p) {
 	
@@ -60,6 +81,10 @@ public abstract class GameElement implements ImageTile{
 	}
 
 
+	public boolean isPickable() {
+		return pickable;
+	}
+
 	@Override
 	public  String getName() {
 		
@@ -76,4 +101,5 @@ public abstract class GameElement implements ImageTile{
 	public int getLayer() {
 		return layer;
 	}
+
 }
