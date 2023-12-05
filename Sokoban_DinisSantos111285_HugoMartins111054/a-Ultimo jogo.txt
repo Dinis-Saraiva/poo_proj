@@ -1,0 +1,13 @@
+a
+
+level0.txt ---- GANHOU com um score de 85
+level1.txt ---- GANHOU com um score de 53
+level2.txt ---- GANHOU com um score de 27
+level3.txt ---- GANHOU com um score de 31
+level4.txt ---- GANHOU com um score de 57
+level5.txt ---- GANHOU com um score de 83
+level6.txt ---- GANHOU com um score de 128
+
+
+
+ SCORE TOTAL==464

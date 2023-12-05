@@ -9,7 +9,7 @@ import pt.iscte.poo.utils.Point2D;
 public class Moveable extends GameElement{
 
 	public Moveable(Point2D position, int layer, String name) {
-		super(position, layer, name,false,true,false);
+		super(position, layer, name,false);
 	}
 	
 	public boolean validMove(Direction direcao) {
@@ -17,8 +17,13 @@ public class Moveable extends GameElement{
 		Point2D position = super.getPosition().plus(direcao.asVector());
 		resultado=GameEngine.getInstance().select(p->p.getPosition().equals(position));
 		for(GameElement g:resultado) {
-			if(!g.isTrasposable())
+			if(!g.isTrasposable()) {
+				if(g instanceof Interactable) {
+					if(((Interactable)g).interaction(this))
+						return true;
+				}
 				return false;
+			}
 		}
 		move(position);
 		return true;

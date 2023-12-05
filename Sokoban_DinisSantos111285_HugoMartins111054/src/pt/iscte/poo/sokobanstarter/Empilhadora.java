@@ -1,27 +1,28 @@
 package pt.iscte.poo.sokobanstarter;
 
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
+
 import java.util.List;
 
 import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
 public class Empilhadora extends Moveable{
-	public int getEnergia() {
-		return energia;
+	private final int ENERGIA_INICIAL=100;		//energia inicial
+	private int energia;
+	private boolean martelo=false;
+	
+	public Empilhadora(Point2D p) {
+		super(p, 2, "Empilhadora_D");
+		setEnergia(ENERGIA_INICIAL);
 	}
-	private int energia=100;
-	public Empilhadora(Point2D position) {
-		super(position, 2, "Empilhadora_D");
-	}
+
 	public void tryMove(int key) {
 		// Move segundo a direcao gerada, mas so' se estiver dentro dos limites
 		Direction novaDirecao=Direction.directionFor(key);
-		Point2D newPosition = super.getPosition().plus(novaDirecao.asVector());	//
 		changeImage(key);
 		if(validMove(novaDirecao)){
-			move(newPosition);
+			move(super.getPosition().plus(novaDirecao.asVector()));
 			energia--;
 		}
 		
@@ -44,19 +45,49 @@ public class Empilhadora extends Moveable{
 	}
 	@Override
 	public boolean validMove(Direction direcao) {
-		List<GameElement> resultado=new ArrayList<>();
 		Point2D position = super.getPosition().plus(direcao.asVector());
-		resultado=GameEngine.getInstance().select(p->p.getPosition().equals(position));
+		List<GameElement> resultado=GameEngine.getInstance().select(p->p.getPosition().equals(position));
+		boolean result=true;
+		for(GameElement g:resultado) {
+			if(!g.isTrasposable())
+				if(g instanceof Moveable)
+					if(!((Moveable) g).validMove(direcao))
+						return false;
+		}
 		for(GameElement g:resultado) {
 			if(!g.isTrasposable()) {
-				if(g.isMoveable()) {
-					if(g instanceof Moveable)
-						return ((Moveable) g).validMove(direcao);
-					}
-				return false;
+				if(g instanceof Moveable)
+					continue;
+				if(g instanceof Pickable) {
+					((Pickable)g).pick();
+					continue;
 				}
+				if(g instanceof Interactable) {
+					if(((Interactable)g).interaction(this))
+						result=false;
+					continue;
+				}
+				return false;
+			}
 		}
-		return true;
+		return result;
+	}
+	
+	
+	public void setEnergia(int energia) {
+		this.energia = energia;
+	}
+	public int getEnergia() {
+		return energia;
+	}
+	public boolean hasMartelo() {
+		return martelo;
+	}
+	public void addMartelo() {
+		martelo=true;
+	}
+	public void decreaseEnergy() {
+		energia--;
 	}
 
 }

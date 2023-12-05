@@ -1,0 +1,7 @@
+4
+
+level6.txt ---- GANHOU com um score de 128
+
+
+
+ SCORE TOTAL==128

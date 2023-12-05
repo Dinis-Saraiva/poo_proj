@@ -5,18 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Predicate;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import pt.iscte.poo.gui.ImageMatrixGUI;
-import pt.iscte.poo.gui.ImageTile;
 import pt.iscte.poo.observer.Observed;
 import pt.iscte.poo.observer.Observer;
 import pt.iscte.poo.utils.Direction;
 import pt.iscte.poo.utils.Point2D;
 
-// Note que esta classe e' um exemplo - nao pretende ser o inicio do projeto, 
-// embora tambem possa ser usada para isso.
 //
 // No seu projeto e' suposto haver metodos diferentes.
 // 
@@ -36,13 +34,15 @@ public class GameEngine implements Observer {
 	// Dimensoes da grelha de jogo
 	public static final int GRID_HEIGHT = 10;
 	public static final int GRID_WIDTH = 10;
-	private static final String FICHEIRO="level1.txt";
+	private final int MAX_LEVEL=6;		//Nivel Maximo
+	private static String FICHEIRO="level5.txt";	//Nome do Nivel atual
 
 	private static GameEngine INSTANCE; // Referencia para o unico objeto GameEngine (singleton)
 	private ImageMatrixGUI gui;  		// Referencia para ImageMatrixGUI (janela de interface com o utilizador) 
-	private List<GameElement> board;	//Lista dos objetos
+	private List<GameElement> board;	// Lista dos objetos
 	private Empilhadora bobcat;	        // Referencia para a empilhadora
-	private String username;
+	private String username;			//Nome do utilizador
+	private Stats stats;
 
 	// Construtor - neste exemplo apenas inicializa uma lista de ImageTiles
 	private GameEngine() {
@@ -69,10 +69,9 @@ public class GameEngine implements Observer {
 
 		
 		// Criar o cenario de jogo
-		createWarehouse();      // criar o armazem
-		//createMoreStuff();      // criar mais algun objetos (empilhadora, caixotes,...)
+		username=ImageMatrixGUI.getInstance().askUser("Qual o username");
 		scanWarehouse();
-		
+		stats=new Stats(username);
 		
 		// Escrever uma mensagem na StatusBar
 		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
@@ -88,10 +87,15 @@ public class GameEngine implements Observer {
 		if (Direction.isDirection(key)) {  // se a tecla for UP/DOWN/LEFT/RIGHT, manda a empilhadora mover
 			bobcat.tryMove(key);
 			}
+		if(key==KeyEvent.VK_SPACE)
+			resetLevel();
+		if(key==KeyEvent.VK_ESCAPE)
+			endGame();
 		gui.update();                  // redesenha a lista de ImageTiles na GUI, 
 		                              // tendo em conta as novas posicoes dos objetos
 		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
-		if(!gameEnded()) {
+		if(levelEnded()) {
+			nextLevel();
 		}
 	}
 
@@ -105,6 +109,7 @@ public class GameEngine implements Observer {
 	}
 	//scan a um warehouse escolhido manualmente
 	public void scanWarehouse() {
+		createWarehouse();      // criar o armazem
 		try {
 
 			Scanner sc= new Scanner(new File(FICHEIRO));
@@ -141,29 +146,62 @@ public class GameEngine implements Observer {
 		board.remove(e);
 		gui.removeImage(e);
 	}
-	public boolean gameEnded() {
-		int test=0;
-		if( bobcat.getEnergia()>0) {
-		
-		for(GameElement g:board) {
-			if(g instanceof Alvo) {
-				for(GameElement i:board) {
-					if(i.getPosition().equals(g.getPosition())) {
-						if(i instanceof Caixote)
-							test=1;
-					}	
-				}
-				if (test==0)
-					return false;
-			} 
-			test=0;
-		}
-		}
-		System.out.println("A energia que restou é " + bobcat.getEnergia());
-		System.exit(1);
-		return true;
-		
+	//Verifica se o nivel acabou verificando primeiro se ficou sem energia
+	// e em segundo se passou o nivel ou seja todos os alvos têm um caixote
+	public boolean levelEnded() {
+		boolean hasCaixote=false;
+		if(bobcat.getEnergia()<=0) {
+			stats.addStat(-1, FICHEIRO);
+			return true;
+			}
+			for(GameElement g:board) {
+				if(g instanceof Alvo) {
+					for(GameElement i:board) 
+						if(i.getPosition().equals(g.getPosition()))
+							if(i instanceof Caixote)
+								hasCaixote=true;	
+					if (!hasCaixote)
+						return false;
+				} 
+				hasCaixote=false;
+			}
+			stats.addStat(bobcat.getEnergia(), FICHEIRO);
+			return true;
 	}
+	//Funcao que reseta o nivel
+	public void resetLevel() {
+		gui.clearImages();
+		board=new ArrayList<GameElement>();
+		scanWarehouse();
+		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
+	}
+	//Funçao que dá load ao próximo nivel
+	public void nextLevel() {
+		//Apaga o nivel anterior
+		gui.clearImages();
+		board=new ArrayList<GameElement>();
+		//Proximo Nivel
+		@SuppressWarnings("resource")
+		int nivel = new Scanner(FICHEIRO).useDelimiter("\\D+").nextInt();
+		if(nivel<MAX_LEVEL) {
+			nivel++;
+		FICHEIRO=("level"+nivel+".txt");
+		scanWarehouse();
+		gui.setStatusMessage("Sokoban: Player- "+ username + ", energia="+bobcat.getEnergia());
+		}else
+			endGame();
+	}
+
+	public Empilhadora getBobcat() {
+		return bobcat;
+	}
+	
+	public void endGame() {
+		stats.endStats();
+		System.exit(1);	
+		}
+	//Funcao generica que 
+	//retorna:uma lista de elementos do jogo com o seguinte predicado
 	public List<GameElement> select(Predicate<GameElement> pred) {
 		List<GameElement> resultado=new ArrayList<>();
 		for(GameElement g:board) {
